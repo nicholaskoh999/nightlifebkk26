@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./styles.css";
+import "./day-selector.css";
 
 export const metadata: Metadata = {
   title: "Bangkok Nightlife 2026 | Nicholas' 4-Night Club Guide",
