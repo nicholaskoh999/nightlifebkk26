@@ -4,6 +4,7 @@ import "./day-selector.css";
 import "./copy-pass.css";
 import "./night-theme.css";
 import "./event-radar.css";
+import "./desktop-density.css";
 
 export const metadata: Metadata = {
   title: "Bangkok Nightlife 2026 | Nicholas' 4-Night Club Guide",
