@@ -7,7 +7,11 @@ Legacy/secondary: `https://nightlifebkk.nkmwei.de`
 Fallback hosting URLs: `https://nightlife26.nicholaskohmw.workers.dev` ·
 `https://bangkok-nightlife-2026.nicholaskoh999.chatgpt.site`
 
-Trip: `19–22 Aug 2026` (Wed–Sat, 4 club nights)
+Trip: `18–22 Aug 2026`
+
+Club nights: `18–21 Aug 2026` (Tue–Fri, 4 nights)
+
+Return: `22 Aug 2026` — not a nightlife night, and not present in the data
 
 ## What this site answers
 
@@ -49,6 +53,11 @@ All venue copy, pricing and evidence lives in `src/data/nightlife.ts` and
 `src/data/event-radar.ts`. It is never mutated at runtime — `src/App.tsx` only
 renders and handles interaction.
 
+Tue 18 is the **arrival night**: the flight lands late, so it carries an
+`arrivalNote` banner, a realistically late arrival time and one room rather
+than a programme. It is a normal night in the data, not a special case in the
+UI.
+
 This is an independent website and is not part of bangkok26.
 
 ## Tech stack
@@ -62,8 +71,18 @@ npm install
 npm run dev
 npm run typecheck
 npm run lint
+npm run qa      # trip-data invariants — also runs as part of build
 npm run build
 ```
+
+## Data QA
+
+`build/data-qa.mjs` runs before every build and fails it if the dataset drifts
+from the trip. It checks the trip window (`2026-08-18` → `2026-08-21`), that
+the four nights are exactly 18–21, that no venue or radar entry is pinned to
+22 Aug, that each night has exactly one PRIMARY and one SWITCH matching the
+agreed route, that no slot outranks a higher-scoring venue without an
+`overrideNote`, and that every price still carries its `EST.` marker.
 
 ## Deploy
 
@@ -94,5 +113,9 @@ to talk — a room with no dancefloor cannot be a PRIMARY or a SWITCH.
 
 A slot may outrank a higher-scoring venue, but never silently. Any such venue
 carries an `overrideNote` and the page renders it as **WHY THIS ORDER** on the
-card. The data QA fails the build if a primary sits below another option, or a
-switch below a More option, without one.
+card. The data QA fails the build if any slot sits above a higher-scoring
+venue without one.
+
+Tue 18 is the live example: Upper House scores a shade higher and is closer to
+base, but Dope & Dirty is the room with an actual Tuesday hip-hop line-up — so
+it takes PRIMARY and says why on the card.

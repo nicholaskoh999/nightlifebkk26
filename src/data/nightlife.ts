@@ -1,5 +1,8 @@
 /**
- * Bangkok Nightlife — 19–22 Aug 2026.
+ * Bangkok Nightlife — club nights 18–21 Aug 2026.
+ *
+ * Bangkok 18–22 Aug 2026; 22 Aug is the return day and is deliberately not a
+ * nightlife night, so it carries no DayId, no venues and no radar entries.
  *
  * All venue copy, pricing and evidence lives here so that App.tsx stays a
  * rendering layer. Nothing in this module is mutated at runtime.
@@ -17,7 +20,7 @@
  */
 
 export type Status = "VERIFIED" | "RECURRING" | "LISTED" | "CHECK SAME DAY" | "ESTIMATE";
-export type DayId = 19 | 20 | 21 | 22;
+export type DayId = 18 | 19 | 20 | 21;
 export type Role = "primary" | "switch" | "more";
 export type Distance = "VERY NEAR" | "NEAR" | "MODERATE" | "FARTHER";
 export type Social = "Very Easy" | "Easy" | "Mixed" | "Hard";
@@ -88,22 +91,160 @@ export type Day = {
   /** ISO date in Asia/Bangkok, used for the dynamic countdown. */
   iso: string;
   headline: string;
+  /**
+   * Only set for a night that is not a normal full night — currently the
+   * arrival night. Rendered as a compact banner, never as a venue claim.
+   */
+  arrivalNote?: { label: string; zh: string; en: string };
 };
 
-export const TRIP = { startIso: "2026-08-19", endIso: "2026-08-22", timeZone: "Asia/Bangkok" } as const;
+export const TRIP = { startIso: "2026-08-18", endIso: "2026-08-21", timeZone: "Asia/Bangkok" } as const;
 
 export const BASE = "TRIBE Sukhumvit 39";
 
 export const days: Day[] = [
+  {
+    id: 18, dow: "TUE", date: "18", full: "Tue · 18 Aug 2026", iso: "2026-08-18",
+    headline: "Arrival night — land first, decide after",
+    arrivalNote: {
+      label: "ARRIVAL NIGHT",
+      zh: "落地夜 — 先入境 / 拿行李 / Check-in。还有精神才去，不用硬冲。",
+      en: "Land → hotel → decide. Don't chase a big event tonight. Go only if you still have energy.",
+    },
+  },
   { id: 19, dow: "WED", date: "19", full: "Wed · 19 Aug 2026", iso: "2026-08-19", headline: "Midweek — go where the crowd already is" },
   { id: 20, dow: "THU", date: "20", full: "Thu · 20 Aug 2026", iso: "2026-08-20", headline: "Thonglor/Ekkamai wakes up on Thursday" },
   { id: 21, dow: "FRI", date: "21", full: "Fri · 21 Aug 2026", iso: "2026-08-21", headline: "The main crowd night — RCA" },
-  { id: 22, dow: "SAT", date: "22", full: "Sat · 22 Aug 2026", iso: "2026-08-22", headline: "Busiest night — but keep it different from Friday" },
 ];
 
 const maps = (q: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
 
 export const venues: Venue[] = [
+  /* ------------------------------- TUE 18 AUG ------------------------------ */
+  /* Arrival night. Researched 18 Aug 2026 — see each statusNote for what the  */
+  /* label actually rests on. Nothing here is upgraded on a hunch.             */
+
+  {
+    id: "dope-18",
+    day: 18,
+    role: "primary",
+    venue: "DOPE & DIRTY",
+    area: "Ekkamai Soi 7 · Sukhumvit 63",
+    distance: "NEAR",
+    event: "TUESDAY LINE-UP · UNDERDOG / GAPZ / K-DROP",
+    status: "LISTED",
+    statusNote: "Current listings show the venue open from 19:00 on Tuesdays with a date-specific 18 Aug hip-hop line-up from 22:00. Listing is credible secondary reporting, not first-party confirmation — and sources disagree about how much floor there is to stand on.",
+    music: "Hip-Hop · R&B",
+    arrival: "00:15 onwards",
+    crowd: 3,
+    solo: "Okay",
+    social: "Mixed",
+    asianMix: "High",
+    tableCulture: "High",
+    dancefloor: "Mixed",
+    whyZh: "周二真的有 hip-hop 阵容、而且是真 club；落地夜只需要一间就够。",
+    whyEn: "The one genuine club with a date-specific Tuesday hip-hop line-up — on an arrival night, one room is the whole plan.",
+    crowdNote: "Compact Ekkamai hip-hop room, young Thai/Asian-leaning crowd, peaks 22:00–01:00. Reports conflict on the floor: some describe a compact dancefloor plus an upstairs EDM room, others describe table seating only.",
+    overrideNote: {
+      zh: "Upper House 分数略高、也更近，但周二这里才有真正的 hip-hop 阵容。不行就走，十分钟车程回 Sukhumvit 24。",
+      en: "Upper House scores a shade higher and sits closer to base, but Dope & Dirty is the room with an actual Tuesday line-up. If it does not land, the switch is ten minutes away.",
+    },
+    pricing: {
+      entry: "~฿0–300 EST.",
+      entryNote: "No published Tuesday door price found; listings show drink pricing only (beer ~฿200, cocktails ~฿350). Budget for a cover you may not be charged.",
+      drink: "~฿200–350 EST.",
+      soloNight: "~฿600–1,200 EST.",
+      table: "OPTIONAL",
+    },
+    mapsUrl: maps("Dope and Dirty Ekkamai Soi 7 Sukhumvit 63 Bangkok"),
+    instagramUrl: "https://www.instagram.com/dopeanddirtybkk/",
+    eventSourceUrl: "https://bangkok-nights.com/venue/dope-dirty",
+    lastVerified: "18 Aug 2026",
+    warning: "Table-leaning · floor space disputed · arrival-night energy first",
+  },
+
+  {
+    id: "upper-18",
+    day: 18,
+    role: "switch",
+    venue: "UPPER HOUSE",
+    area: "24BLVD 2F · Sukhumvit 24",
+    distance: "VERY NEAR",
+    event: "NARTEE & FRIENDS · 21:00–03:30",
+    status: "LISTED",
+    statusNote: "Listed as open Tue–Sun from 21:00, with a date-specific 18 Aug party-hits line-up running to 03:30. Credible secondary listing; no first-party confirmation of Tuesday density.",
+    music: "R&B · Hip-Hop · party hits",
+    arrival: "00:30–01:00",
+    crowd: 3,
+    solo: "Okay",
+    social: "Mixed",
+    asianMix: "High",
+    tableCulture: "Medium",
+    dancefloor: "Good",
+    whyZh: "离酒店最近的真舞池，周二也有 line-up；累了就直接来这间，不用再跑。",
+    whyEn: "The nearest real dancefloor to base, and it has its own Tuesday line-up — the low-effort version of the night.",
+    switchReason: "Ten minutes back down Sukhumvit from Ekkamai, and it is the room with an actual dancefloor rather than a table plan. On an arrival night that also makes it a legitimate place to simply start.",
+    crowdNote: "R&B/hip-hop room with a genuine floor plus tables. Tuesday density is unproven — it is a Tue–Sun venue, not a weekend-only one.",
+    pricing: { entry: "~฿400–500 EST.", entryNote: "No current published door price found.", drink: "~฿250–400 EST.", soloNight: "~฿900–1,800 EST.", table: "OPTIONAL" },
+    mapsUrl: maps("Upper House Bangkok 24BLVD Sukhumvit 24"),
+    officialUrl: "https://upperhousebangkok.com/",
+    eventSourceUrl: "https://bangkok-nights.com/venue/upper-house",
+    lastVerified: "18 Aug 2026",
+    warning: "Tuesday crowd unconfirmed",
+  },
+
+  {
+    id: "savoy-18",
+    day: 18,
+    role: "more",
+    venue: "HOUSE OF SAVOY",
+    area: "SILQ Hotel · Sukhumvit 24",
+    distance: "VERY NEAR",
+    status: "CHECK SAME DAY",
+    statusNote: "Listed as opening 21:00 on Tuesdays, but no 18 Aug programme is listed — the same source shows events only from 20 Aug onward. Walk past, do not plan around it.",
+    music: "Party hits · club",
+    arrival: "00:30",
+    crowd: 3,
+    solo: "Okay",
+    social: "Mixed",
+    asianMix: "Medium",
+    tableCulture: "High",
+    dancefloor: "Mixed",
+    whyZh: "同一条 soi，走两分钟就能看一眼；但周二没有节目表。",
+    whyEn: "Two minutes from Upper House, so it costs nothing to look — but nothing is programmed for a Tuesday.",
+    crowdNote: "Polished hotel-club room, table-leaning. No Tuesday evidence either way.",
+    pricing: { entry: "~฿500 EST.", entryNote: "Unconfirmed.", drink: "~฿400+ EST.", soloNight: "~฿1,000–2,000 EST.", table: "OPTIONAL" },
+    mapsUrl: maps("House of Savoy SILQ Hotel Sukhumvit 24 Bangkok"),
+    lastVerified: "18 Aug 2026",
+    warning: "Table-led room · no Tuesday programme listed",
+  },
+
+  {
+    id: "baccarat-18",
+    day: 18,
+    role: "more",
+    venue: "BACCARAT",
+    area: "Sukhumvit 24",
+    distance: "VERY NEAR",
+    status: "CHECK SAME DAY",
+    statusNote: "Reported to run a weekly Tuesday hip-hop night, but sources disagree on the hours and none confirms 18 Aug. Bottle-service led.",
+    music: "Hip-Hop",
+    arrival: "00:30",
+    crowd: 3,
+    solo: "Better With Group",
+    social: "Mixed",
+    asianMix: "Medium",
+    tableCulture: "High",
+    dancefloor: "Table-heavy",
+    whyZh: "周二有 hip-hop 场，但是开桌文化很重，一个人不划算。",
+    whyEn: "It does run a Tuesday hip-hop night, but it is a bottle-service room — an expensive way to stand alone.",
+    crowdNote: "Upscale VIP club on Sukhumvit 24. Table-first floor; solo walk-ins are not what the room is built for.",
+    pricing: { entry: "~฿500+ EST.", entryNote: "Unconfirmed; minimum spend can apply.", drink: "~฿450+ EST.", soloNight: "~฿1,500–3,000 EST.", table: "RECOMMENDED" },
+    mapsUrl: maps("Baccarat Bangkok Sukhumvit 24"),
+    lastVerified: "18 Aug 2026",
+    warning: "Table-led room",
+  },
+
   /* ------------------------------- WED 19 AUG ------------------------------ */
 
   {
@@ -473,173 +614,6 @@ export const venues: Venue[] = [
     pricing: { entry: "~฿400 / ~฿200 EST.", entryNote: "Listed as ~฿400 men, ~฿200 women, including a drink; reports range ฿300–500.", drink: "~฿300+ EST.", soloNight: "~฿700–1,400 EST.", table: "NOT REQUIRED" },
     mapsUrl: maps("Sugar Club Bangkok Sukhumvit 11"),
     lastVerified: "18 Aug 2026",
-  },
-
-  /* ------------------------------- SAT 22 AUG ------------------------------ */
-
-  {
-    id: "404-22",
-    day: 22,
-    role: "primary",
-    venue: "404 CLUB NOT FOUND",
-    area: "EmSphere 5M · Phrom Phong",
-    distance: "VERY NEAR",
-    status: "RECURRING",
-    statusNote: "Saturday is the venue's peak night and EmSphere's nightlife floors run every weekend. No date-specific 22 Aug guest confirmed.",
-    music: "Open-format · guest DJ + MC",
-    arrival: "23:00–23:30",
-    crowd: 4,
-    solo: "Easy",
-    social: "Easy",
-    asianMix: "High",
-    tableCulture: "Low",
-    dancefloor: "Good",
-    whyZh: "周六换个 scene：不用跑 RCA，站着跳、不用开桌，亚洲客为主。",
-    whyEn: "A different Saturday to Friday — standing/dancefloor micro-club, no table pressure, 6 minutes from base.",
-    crowdNote: "Asian micro-club format with guest DJs and MCs; the room is built for a standing crowd rather than bottle tables.",
-    pricing: { entry: "~฿300–500 EST.", entryNote: "No current published door price found — budget for the higher end on a Saturday.", drink: "~฿300+ EST.", soloNight: "~฿800–1,600 EST.", table: "NOT REQUIRED" },
-    mapsUrl: maps("404 Club Not Found EmSphere 5M Bangkok"),
-    officialUrl: "https://www.facebook.com/404clubnotfound.bkk/",
-    overrideNote: {
-      zh: "换场景推荐：Route 66 分数略高，但周五已经去 RCA，周六故意换 404。",
-      en: "Variety pick. Route 66 scores slightly higher, but Friday already covers RCA — Saturday deliberately switches scene.",
-    },
-    lastVerified: "18 Aug 2026",
-  },
-
-  {
-    id: "upper-22",
-    day: 22,
-    role: "switch",
-    venue: "UPPER HOUSE",
-    area: "24BLVD 2F · Sukhumvit 24",
-    distance: "VERY NEAR",
-    status: "RECURRING",
-    statusNote: "Opens 21:00 daily; Saturday is a peak night for this strip. No 22 Aug guest confirmed.",
-    music: "R&B · Hip-Hop",
-    arrival: "00:00–00:30",
-    crowd: 5,
-    solo: "Okay",
-    social: "Easy",
-    asianMix: "High",
-    tableCulture: "Medium",
-    dancefloor: "Good",
-    whyZh: "同一区，四分钟车程，周六一定有人。",
-    whyEn: "Four minutes away and reliably full on a Saturday — the cheapest switch on the whole trip.",
-    switchReason: "404 is new, so its Saturday density is the one unknown. Upper House on a Saturday is not — and it is one soi away.",
-    crowdNote: "R&B/hip-hop with a packed floor at weekends; young local and expat crowd.",
-    pricing: { entry: "~฿400–500 EST.", entryNote: "No current published door price found.", drink: "~฿350+ EST.", soloNight: "~฿900–1,800 EST.", table: "OPTIONAL" },
-    mapsUrl: maps("Upper House Bangkok 24BLVD Sukhumvit 24"),
-    officialUrl: "https://upperhousebangkok.com/",
-    overrideNote: {
-      zh: "分数比 404 高一点，但 404 是新场，先看它；这里四分钟就到。",
-      en: "Scores a shade higher than tonight's pick, but 404 is the newer scene worth trying first — and this is four minutes away.",
-    },
-    lastVerified: "18 Aug 2026",
-  },
-
-  {
-    id: "route66-22",
-    day: 22,
-    role: "more",
-    venue: "ROUTE 66",
-    area: "RCA · Royal City Avenue",
-    distance: "MODERATE",
-    status: "RECURRING",
-    statusNote: "Reported as its most crowded night of the week. Same three-room format and ฿300 entry-with-credit.",
-    music: "Hip-Hop · Thai pop · EDM (3 rooms)",
-    arrival: "23:00",
-    crowd: 5,
-    solo: "Easy",
-    social: "Easy",
-    asianMix: "High",
-    tableCulture: "Medium",
-    dancefloor: "Good",
-    whyZh: "人最多的一晚，但周五刚去过，重复了。",
-    whyEn: "Objectively the biggest Saturday crowd — deliberately demoted only because Friday already used it.",
-    crowdNote: "Busiest night of its week; hard to find a table after 22:00, which is fine when you do not want one.",
-    pricing: { entry: "~฿300 EST.", entryNote: "Widely listed foreigner entry, returned as ฿300 in drink credit.", drink: "~฿250+ EST.", soloNight: "~฿700–1,500 EST.", table: "NOT REQUIRED" },
-    mapsUrl: maps("Route 66 Club RCA Royal City Avenue Bangkok"),
-    officialUrl: "https://www.route66club.com/",
-    lastVerified: "18 Aug 2026",
-  },
-
-  {
-    id: "sugar-22",
-    day: 22,
-    role: "more",
-    venue: "SUGAR CLUB",
-    area: "Sukhumvit 11",
-    distance: "NEAR",
-    status: "ESTIMATE",
-    statusNote: "No date-specific listing. Normal weekend venue behaviour only.",
-    music: "Hip-Hop",
-    arrival: "00:00",
-    crowd: 4,
-    solo: "Easy",
-    social: "Easy",
-    asianMix: "Medium",
-    tableCulture: "Low",
-    dancefloor: "Mixed",
-    whyZh: "Hip-Hop 想再深一点就来，缺点是场地小。",
-    whyEn: "Go if you want the hip-hop turned up; the trade-off is a genuinely small room.",
-    crowdNote: "Packed at weekends, minimal seating, small floor. More foreigner-leaning than Phrom Phong rooms.",
-    pricing: { entry: "~฿400 / ~฿200 EST.", entryNote: "Listed as ~฿400 men, ~฿200 women, including a drink; reports range ฿300–500.", drink: "~฿300+ EST.", soloNight: "~฿700–1,400 EST.", table: "NOT REQUIRED" },
-    mapsUrl: maps("Sugar Club Bangkok Sukhumvit 11"),
-    lastVerified: "18 Aug 2026",
-  },
-
-  {
-    id: "spaceplus-22",
-    day: 22,
-    role: "more",
-    venue: "SPACEPLUS",
-    area: "Rama 9 · near RCA",
-    distance: "FARTHER",
-    status: "ESTIMATE",
-    statusNote: "No date-specific 22 Aug listing. Weekend behaviour only.",
-    music: "EDM · Thai remix",
-    arrival: "23:30",
-    crowd: 5,
-    solo: "Okay",
-    social: "Mixed",
-    asianMix: "High",
-    tableCulture: "High",
-    dancefloor: "Good",
-    whyZh: "大场大舞池，但很挤、桌子文化重，一个人不好走动。",
-    whyEn: "Big room, big floor — but weekend crush plus heavy table culture makes solo movement hard.",
-    crowdNote: "Busiest Fri/Sat; reported as uncomfortably crowded at peak, with a ฿500 door including a drink.",
-    pricing: { entry: "~฿500 EST.", entryNote: "Commonly listed at ฿500 with 1 drink; minimum spend can apply on special nights.", drink: "~฿350+ EST.", soloNight: "~฿1,000–2,000 EST.", table: "OPTIONAL" },
-    mapsUrl: maps("Spaceplus Bangkok Rama 9"),
-    lastVerified: "18 Aug 2026",
-  },
-
-  {
-    id: "salone-22",
-    day: 22,
-    role: "more",
-    venue: "SALONE DI VITA",
-    area: "Sukhumvit 63 · Ekkamai",
-    distance: "NEAR",
-    status: "CHECK SAME DAY",
-    statusNote: "Weekly guest-DJ programme; no 22 Aug name confirmed.",
-    music: "Open-format · guest DJs",
-    arrival: "23:30",
-    crowd: 4,
-    solo: "Better With Group",
-    social: "Mixed",
-    asianMix: "High",
-    tableCulture: "High",
-    dancefloor: "Table-heavy",
-    whyZh: "好看但 bottle-service 为主，一个人不划算。",
-    whyEn: "Looks the best on this list and works the worst alone.",
-    crowdNote: "Boutique VIP lounge-club, bottle-service led.",
-    pricing: { entry: "~฿500 EST.", entryNote: "Door policy varies by guest DJ; unconfirmed.", drink: "~฿400+ EST.", soloNight: "~฿1,200–2,500 EST.", table: "RECOMMENDED" },
-    mapsUrl: maps("Salone di Vita Sukhumvit 63 Ekkamai Bangkok"),
-    officialUrl: "https://salonedivita.com/",
-    instagramUrl: "https://www.instagram.com/salonedivita/",
-    lastVerified: "18 Aug 2026",
-    warning: "Table-led room",
   },
 ];
 

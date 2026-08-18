@@ -45,16 +45,4 @@ export const eventRadar: RadarEvent[] = [
     eventSourceUrl: "https://allevents.in/bangkok/parties",
     lastVerified: "18 Aug 2026",
   },
-  {
-    day: 22,
-    venue: "BAFROS",
-    area: "Asok",
-    event: "PARTY HITS · OSOCITY",
-    time: "22:00",
-    status: "LISTED",
-    note: "Afrobeats / Amapiano / Soca. Good room, but a niche music crowd rather than a big mainstream Saturday floor.",
-    mapsUrl: maps("Bafros Asok Bangkok"),
-    eventSourceUrl: "https://allevents.in/bangkok/parties",
-    lastVerified: "18 Aug 2026",
-  },
 ];

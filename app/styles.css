@@ -149,6 +149,25 @@ main { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
   font-weight: 750;
 }
 
+/* Arrival night is the one night that is not a normal night. One compact
+   banner says so; it never grows into a second card. */
+.arrival {
+  display: grid; gap: 3px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--violet);
+  border-left-width: 3px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--violet) 9%, var(--bg-2));
+  font-size: 13px; line-height: 1.45;
+  color: var(--ink);
+}
+.arrival b {
+  font-size: 10px; font-weight: 850; letter-spacing: .14em;
+  color: var(--violet);
+}
+.arrival span:last-child { color: var(--muted); }
+
 /* ------------------------------- dashboard ------------------------------- */
 
 .dashboard { display: grid; gap: 14px; align-items: start; }

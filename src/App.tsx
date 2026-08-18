@@ -158,7 +158,8 @@ export default function NightlifeApp() {
   const [sheet, setSheet] = useState<Venue | null>(null);
 
   // Read on the client only — the server snapshot is null, so there is nothing
-  // to mismatch on hydration. Friday is the fallback when the trip is not live.
+  // to mismatch on hydration. Friday is the fallback when the trip is not live:
+  // it is the one night whose crowd is not weather-dependent on evidence.
   const trip = useSyncExternalStore(subscribeTripState, currentTripState, () => null);
   const day: DayId = chosenDay ?? trip?.today ?? 21;
   const setDay = setChosenDay;
@@ -189,7 +190,7 @@ export default function NightlifeApp() {
       <main>
         <section className="hero">
           <h1>BANGKOK NIGHTLIFE <em>&apos;26</em></h1>
-          <p>19–22 AUG · 4 NIGHTS · CROWD FIRST</p>
+          <p>18–21 AUG · 4 NIGHTS · CROWD FIRST</p>
         </section>
 
         <nav className="days" aria-label="Choose night">
@@ -210,6 +211,13 @@ export default function NightlifeApp() {
         <section className="dayline">
           <p>{dayData.full}</p>
           <h2>{dayData.headline}</h2>
+          {dayData.arrivalNote && (
+            <aside className="arrival" aria-label={dayData.arrivalNote.label}>
+              <b>{dayData.arrivalNote.label}</b>
+              <span lang="zh-Hans">{dayData.arrivalNote.zh}</span>
+              <span>{dayData.arrivalNote.en}</span>
+            </aside>
+          )}
         </section>
 
         <div className="dashboard" id="tonight">
