@@ -1,8 +1,11 @@
 # Bangkok Nightlife 2026
 
-Production: `https://nightlifebkk.nkmwei.de`
+Production: `https://nightlife26.nkmwei.de`
 
-Fallback hosting URL: `https://bangkok-nightlife-2026.nicholaskoh999.chatgpt.site`
+Legacy/secondary: `https://nightlifebkk.nkmwei.de`
+
+Fallback hosting URLs: `https://nightlife26.nicholaskohmw.workers.dev` ·
+`https://bangkok-nightlife-2026.nicholaskoh999.chatgpt.site`
 
 Trip: `19–22 Aug 2026` (Wed–Sat, 4 club nights)
 
@@ -64,7 +67,23 @@ npm run build
 
 ## Deploy
 
-Build the current `main` commit, save it as a version in the existing Bangkok Nightlife Sites project, then publish that saved version. Configure `nightlifebkk.nkmwei.de` through the Sites custom-domain flow; the fallback hosting URL remains available.
+Production runs as a Cloudflare Worker (`nightlife26`) built by Vinext and the
+Cloudflare Vite plugin. `npm run build` emits `dist/server/wrangler.json` plus
+the static assets in `dist/client`:
+
+```bash
+npm ci
+npm run typecheck
+npm run lint
+npm run build
+npx wrangler deploy -c dist/server/wrangler.json --name nightlife26
+```
+
+`nightlife26.nkmwei.de` is attached as a Workers custom domain, so Cloudflare
+manages the DNS record and the certificate — no manual DNS entry is needed.
+
+The legacy `nightlifebkk.nkmwei.de` host is still served by the separate Sites
+deployment and is left untouched.
 
 ## Scope
 
