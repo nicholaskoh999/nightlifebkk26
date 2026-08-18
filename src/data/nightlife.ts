@@ -24,7 +24,7 @@ export type Social = "Very Easy" | "Easy" | "Mixed" | "Hard";
 export type Solo = "Very Easy" | "Easy" | "Okay" | "Better With Group";
 export type AsianMix = "High" | "Medium" | "Unknown";
 export type TableCulture = "Low" | "Medium" | "High";
-export type Dancefloor = "Excellent" | "Good" | "Mixed" | "Table-heavy" | "No floor";
+export type Dancefloor = "Excellent" | "Good" | "Mixed" | "Table-heavy";
 
 export type Pricing = {
   /** Door price. Always carries its own EST. marker when unconfirmed. */
@@ -64,6 +64,11 @@ export type Venue = {
   whyEn: string;
   /** Only for role: "switch" — why this is the 30-minute escape hatch. */
   switchReason?: string;
+  /**
+   * Set whenever this venue is ranked above something with a higher fitScore.
+   * The page must never show a lower score in a higher slot without saying why.
+   */
+  overrideNote?: { zh: string; en: string };
   crowdNote: string;
   pricing: Pricing;
   mapsUrl: string;
@@ -100,6 +105,7 @@ const maps = (q: string) => `https://www.google.com/maps/search/?api=1&query=${e
 
 export const venues: Venue[] = [
   /* ------------------------------- WED 19 AUG ------------------------------ */
+
   {
     id: "muin-19",
     day: 19,
@@ -121,7 +127,7 @@ export const venues: Venue[] = [
     whyEn: "Wednesday is its week-opening night, so the crowd is concentrated instead of scattered.",
     crowdNote: "Korean-brand EDM club in Thonglor; party fills after 23:00. Crowd leans Thai/Asian.",
     pricing: {
-      entry: "฿500",
+      entry: "~฿500 EST.",
       entryNote: "Listed cover including 2 drinks — confirm at the door, it varies by event.",
       drink: "~฿300+ EST.",
       soloNight: "~฿800–1,600 EST.",
@@ -132,39 +138,35 @@ export const venues: Venue[] = [
     instagramUrl: "https://www.instagram.com/muin_bangkok/",
     lastVerified: "18 Aug 2026",
   },
+
   {
-    id: "tictactoe-19",
+    id: "404-19",
     day: 19,
     role: "switch",
-    venue: "TICTACTOE",
-    area: "EmSphere 5F · Phrom Phong",
+    venue: "404 CLUB NOT FOUND",
+    area: "EmSphere 5M · Phrom Phong",
     distance: "VERY NEAR",
-    status: "RECURRING",
-    statusNote: "Documented nightly format: live music ~20:30–21:30, then DJ (hip-hop / pop / K-pop). No 19 Aug guest confirmed.",
-    music: "Hip-Hop · pop · K-pop · live early",
-    arrival: "21:30–23:00",
+    status: "CHECK SAME DAY",
+    statusNote: "Open-format guest DJ/MC venue, but no confirmed Wednesday programme.",
+    music: "Open-format",
+    arrival: "23:00",
     crowd: 3,
-    solo: "Very Easy",
-    social: "Very Easy",
+    solo: "Easy",
+    social: "Easy",
     asianMix: "High",
-    tableCulture: "Medium",
-    dancefloor: "No floor",
-    whyZh: "本来就是 social bar，一个人来也不奇怪，聊天最自然。",
-    whyEn: "Built as a social/date bar — message screen, tight room, people actually talk to each other.",
-    switchReason: "If MU:IN is thin on a Wednesday, this still works solo — it is a talking room, not a table room.",
-    crowdNote: "More bar than club: no proper dancefloor, but the easiest room to start a conversation in. Busy at weekends — a Wednesday here is quieter.",
-    pricing: {
-      entry: "NO COVER EST.",
-      entryNote: "Walk-in bar seating; table areas carry a minimum spend.",
-      drink: "~฿350+ EST.",
-      soloNight: "~฿700–1,400 EST.",
-      table: "NOT REQUIRED",
-    },
-    mapsUrl: maps("Tictactoe Bangkok EmSphere 5th floor Sukhumvit"),
-    officialUrl: "https://emsphere.co.th/directory/",
-    instagramUrl: "https://www.instagram.com/tictactoebangkok/",
+    tableCulture: "Low",
+    dancefloor: "Good",
+    whyZh: "真 club、不用开桌、离酒店最近；但周三人多不多没保证。",
+    whyEn: "A real club, no table pressure, 6 minutes from base — but its Wednesday crowd is unproven.",
+    switchReason: "The nearest genuine club to base. Go and look — nothing confirms a Wednesday crowd here, so treat it as a room to check, not a room that is busy.",
+    crowdNote: "Asian micro-club format, standing/dancefloor led rather than table led. No evidence either way for a Wednesday.",
+    pricing: { entry: "~฿300–500 EST.", entryNote: "No current published door price found.", drink: "~฿300+ EST.", soloNight: "~฿700–1,500 EST.", table: "NOT REQUIRED" },
+    mapsUrl: maps("404 Club Not Found EmSphere 5M Bangkok"),
+    officialUrl: "https://www.facebook.com/404clubnotfound.bkk/",
     lastVerified: "18 Aug 2026",
+    warning: "Wednesday crowd unconfirmed — look before committing",
   },
+
   {
     id: "upper-19",
     day: 19,
@@ -190,31 +192,7 @@ export const venues: Venue[] = [
     officialUrl: "https://upperhousebangkok.com/",
     lastVerified: "18 Aug 2026",
   },
-  {
-    id: "404-19",
-    day: 19,
-    role: "more",
-    venue: "404 CLUB NOT FOUND",
-    area: "EmSphere 5M · Phrom Phong",
-    distance: "VERY NEAR",
-    status: "CHECK SAME DAY",
-    statusNote: "Open-format guest DJ/MC venue, but no confirmed Wednesday programme.",
-    music: "Open-format",
-    arrival: "23:00",
-    crowd: 3,
-    solo: "Easy",
-    social: "Easy",
-    asianMix: "High",
-    tableCulture: "Low",
-    dancefloor: "Good",
-    whyZh: "同一栋，走过去 30 秒；但周三不一定有人。",
-    whyEn: "Same building as TICTACTOE, so it costs nothing to look — midweek crowd unproven.",
-    crowdNote: "Asian micro-club format, standing/dancefloor led rather than table led.",
-    pricing: { entry: "~฿300–500 EST.", entryNote: "No current published door price found.", drink: "~฿300+ EST.", soloNight: "~฿700–1,500 EST.", table: "NOT REQUIRED" },
-    mapsUrl: maps("404 Club Not Found EmSphere 5M Bangkok"),
-    officialUrl: "https://www.facebook.com/404clubnotfound.bkk/",
-    lastVerified: "18 Aug 2026",
-  },
+
   {
     id: "offmap-19",
     day: 19,
@@ -241,58 +219,64 @@ export const venues: Venue[] = [
   },
 
   /* ------------------------------- THU 20 AUG ------------------------------ */
+
   {
     id: "upper-20",
     day: 20,
-    role: "switch",
+    role: "primary",
     venue: "UPPER HOUSE",
     area: "24BLVD 2F · Sukhumvit 24",
     distance: "VERY NEAR",
     status: "RECURRING",
     statusNote: "Opens 21:00 daily; Thonglor/Ekkamai-side venues are consistently reported busiest Thu–Sat. No 20 Aug guest confirmed.",
     music: "R&B · Hip-Hop",
-    arrival: "23:30–00:30",
+    arrival: "23:00–23:30",
     crowd: 4,
     solo: "Okay",
     social: "Easy",
     asianMix: "High",
     tableCulture: "Medium",
     dancefloor: "Good",
-    whyZh: "想真的跳舞就转这里，四分钟车程，周四这一带才开始热。",
+    whyZh: "周四这一带才开始热，而且是离酒店最近的真 club。",
     whyEn: "Thursday is the first genuinely busy night on this side of town, and this is the nearest real dancefloor.",
-    switchReason: "TICTACTOE has no dancefloor. When you want to actually dance — or the bar is too tight — this is a real club four minutes away.",
     crowdNote: "R&B/hip-hop room with a packed floor rather than a bottle-only room; young local + expat mix.",
     pricing: { entry: "~฿400–500 EST.", entryNote: "No current published door price found.", drink: "~฿350+ EST.", soloNight: "~฿900–1,800 EST.", table: "OPTIONAL" },
     mapsUrl: maps("Upper House Bangkok 24BLVD Sukhumvit 24"),
     officialUrl: "https://upperhousebangkok.com/",
     lastVerified: "18 Aug 2026",
   },
+
   {
-    id: "tictactoe-20",
+    id: "savoy-20",
     day: 20,
-    role: "primary",
-    venue: "TICTACTOE",
-    area: "EmSphere 5F · Phrom Phong",
+    role: "switch",
+    venue: "HOUSE OF SAVOY",
+    area: "SILQ Hotel · Sukhumvit 24",
     distance: "VERY NEAR",
-    status: "RECURRING",
-    statusNote: "Documented nightly format: live music early, DJ after. No 20 Aug guest confirmed.",
-    music: "Hip-Hop · pop · K-pop",
-    arrival: "22:30–23:30",
-    crowd: 4,
-    solo: "Very Easy",
-    social: "Very Easy",
-    asianMix: "High",
-    tableCulture: "Medium",
-    dancefloor: "No floor",
-    whyZh: "周四不是大场夜，先去最好聊天的房间，想跳舞再走四分钟。",
-    whyEn: "Thursday is a shoulder night — open in the room built for talking, escalate to a dancefloor only if you want one.",
-    crowdNote: "Tight, social-by-design bar. Busy on Thursdays; reservations help but walk-in bar space exists.",
-    pricing: { entry: "NO COVER EST.", entryNote: "Walk-in bar seating; table areas carry a minimum spend.", drink: "~฿350+ EST.", soloNight: "~฿700–1,400 EST.", table: "NOT REQUIRED" },
-    mapsUrl: maps("Tictactoe Bangkok EmSphere 5th floor Sukhumvit"),
-    officialUrl: "https://emsphere.co.th/directory/",
-    instagramUrl: "https://www.instagram.com/tictactoebangkok/",
+    status: "CHECK SAME DAY",
+    statusNote: "Previously listed GUZZ / STAYHIGH for 20 Aug; not re-confirmed, so the event claim has been removed.",
+    music: "Party hits · club",
+    arrival: "00:00–00:30",
+    crowd: 3,
+    solo: "Okay",
+    social: "Mixed",
+    asianMix: "Medium",
+    tableCulture: "High",
+    dancefloor: "Mixed",
+    whyZh: "同一条 soi，走过去两分钟，不用重新叫车。",
+    whyEn: "Same soi as Upper House — a two-minute walk, which is the whole point of a switch.",
+    switchReason: "The only real club within walking distance of Upper House. It is table-leaning and its Thursday crowd is unconfirmed — but at 00:30 a switch you can walk to beats a 25-minute ride to RCA.",
+    crowdNote: "Polished hotel-club room, table-leaning. Density unconfirmed.",
+    pricing: { entry: "~฿500 EST.", entryNote: "Unconfirmed.", drink: "~฿400+ EST.", soloNight: "~฿1,000–2,000 EST.", table: "OPTIONAL" },
+    mapsUrl: maps("House of Savoy SILQ Hotel Sukhumvit 24 Bangkok"),
+    overrideNote: {
+      zh: "ONYX 分数略高，但在 RCA，凌晨要跑 25 分钟；这里走两分钟。",
+      en: "ONYX scores higher but sits 25 minutes away in RCA. A switch you can walk to in two minutes is worth more at 00:30.",
+    },
     lastVerified: "18 Aug 2026",
+    warning: "Table-led room · Thursday crowd unconfirmed",
   },
+
   {
     id: "salone-20",
     day: 20,
@@ -320,6 +304,7 @@ export const venues: Venue[] = [
     lastVerified: "18 Aug 2026",
     warning: "Table-led room",
   },
+
   {
     id: "onyx-20",
     day: 20,
@@ -340,37 +325,14 @@ export const venues: Venue[] = [
     whyZh: "周四跑 RCA 不划算，除非当天 lineup 够强。",
     whyEn: "A 25-minute ride for a table-led room is a bad Thursday trade unless the line-up is strong.",
     crowdNote: "Reviews repeatedly describe standing tables and VIP tables dominating the floor.",
-    pricing: { entry: "฿400–500", entryNote: "Widely listed door price, usually including drink vouchers. Higher for headliners.", drink: "~฿350+ EST.", soloNight: "~฿900–1,800 EST.", table: "OPTIONAL" },
+    pricing: { entry: "~฿400–500 EST.", entryNote: "Widely listed door price, usually including drink vouchers. Higher for headliners.", drink: "~฿350+ EST.", soloNight: "~฿900–1,800 EST.", table: "OPTIONAL" },
     mapsUrl: maps("ONYX Bangkok RCA Royal City Avenue"),
     officialUrl: "https://onyxbangkok.club/",
     lastVerified: "18 Aug 2026",
   },
-  {
-    id: "savoy-20",
-    day: 20,
-    role: "more",
-    venue: "HOUSE OF SAVOY",
-    area: "SILQ Hotel · Sukhumvit 24",
-    distance: "VERY NEAR",
-    status: "CHECK SAME DAY",
-    statusNote: "Previously listed GUZZ / STAYHIGH for 20 Aug; not re-confirmed, so the event claim has been removed.",
-    music: "Party hits · club",
-    arrival: "23:00",
-    crowd: 3,
-    solo: "Okay",
-    social: "Mixed",
-    asianMix: "Medium",
-    tableCulture: "High",
-    dancefloor: "Mixed",
-    whyZh: "在 Upper House 隔壁，顺路看一眼就好，别专程去。",
-    whyEn: "Next door to Upper House — worth a look in passing, not worth a trip.",
-    crowdNote: "Polished hotel-club room, table-leaning. Density unconfirmed.",
-    pricing: { entry: "~฿500 EST.", entryNote: "Unconfirmed.", drink: "~฿400+ EST.", soloNight: "~฿1,000–2,000 EST.", table: "OPTIONAL" },
-    mapsUrl: maps("House of Savoy SILQ Hotel Sukhumvit 24 Bangkok"),
-    lastVerified: "18 Aug 2026",
-  },
 
   /* ------------------------------- FRI 21 AUG ------------------------------ */
+
   {
     id: "route66-21",
     day: 21,
@@ -392,7 +354,7 @@ export const venues: Venue[] = [
     whyEn: "The most reliable Friday crowd in town, and three rooms means you change the vibe without leaving.",
     crowdNote: "Thai university crowd dominant; rooms are typically packed well before midnight. Entry is effectively free once the drink credit is used.",
     pricing: {
-      entry: "฿300",
+      entry: "~฿300 EST.",
       entryNote: "Widely listed foreigner entry, returned as ฿300 in drink credit. Thai nationals reported free.",
       drink: "~฿250+ EST.",
       soloNight: "~฿700–1,500 EST.",
@@ -402,6 +364,7 @@ export const venues: Venue[] = [
     officialUrl: "https://www.route66club.com/",
     lastVerified: "18 Aug 2026",
   },
+
   {
     id: "onyx-21",
     day: 21,
@@ -423,11 +386,16 @@ export const venues: Venue[] = [
     whyEn: "Same strip as Route 66 — a two-minute walk, no second taxi, no lost night.",
     switchReason: "The switch is operational, not aspirational: you are already on RCA, so changing rooms costs two minutes instead of half an hour.",
     crowdNote: "Bigger production, higher door, more table-led floor. Good crowd, harder to move through than Route 66.",
-    pricing: { entry: "฿400–500", entryNote: "Widely listed door price, usually including drink vouchers. Higher for headliners.", drink: "~฿350+ EST.", soloNight: "~฿900–1,800 EST.", table: "OPTIONAL" },
+    pricing: { entry: "~฿400–500 EST.", entryNote: "Widely listed door price, usually including drink vouchers. Higher for headliners.", drink: "~฿350+ EST.", soloNight: "~฿900–1,800 EST.", table: "OPTIONAL" },
     mapsUrl: maps("ONYX Bangkok RCA Royal City Avenue"),
     officialUrl: "https://onyxbangkok.club/",
+    overrideNote: {
+      zh: "404 分数更高，但在 Phrom Phong；ONYX 就在同一条街，走两分钟。",
+      en: "404 scores higher but is back in Phrom Phong. ONYX is on the same strip — a switch has to be walkable to be a switch.",
+    },
     lastVerified: "18 Aug 2026",
   },
+
   {
     id: "404-21",
     day: 21,
@@ -453,6 +421,7 @@ export const venues: Venue[] = [
     officialUrl: "https://www.facebook.com/404clubnotfound.bkk/",
     lastVerified: "18 Aug 2026",
   },
+
   {
     id: "void-21",
     day: 21,
@@ -473,13 +442,14 @@ export const venues: Venue[] = [
     whyZh: "纯跳舞最强，但音乐硬、聊天难，crowd-first 的话不是第一顺位。",
     whyEn: "Best pure dancefloor on this list, but harder music and a heads-down crowd — not a crowd-first pick.",
     crowdNote: "Purpose-built arena, 800–1,200 capacity, big production. Great to dance in, harder to talk in.",
-    pricing: { entry: "~฿500", entryNote: "Commonly listed at around ฿500, often including drinks; varies by event.", drink: "~฿350+ EST.", soloNight: "~฿900–1,800 EST.", table: "NOT REQUIRED" },
+    pricing: { entry: "~฿500 EST.", entryNote: "Commonly listed at around ฿500, often including drinks; varies by event.", drink: "~฿350+ EST.", soloNight: "~฿900–1,800 EST.", table: "NOT REQUIRED" },
     mapsUrl: maps("VOID Club Bangkok ONE Complex Rama 9"),
     officialUrl: "https://www.voidclubbkk.com/",
     instagramUrl: "https://www.instagram.com/voidclub.bkk/",
     lastVerified: "18 Aug 2026",
     warning: "Harder music",
   },
+
   {
     id: "sugar-21",
     day: 21,
@@ -500,12 +470,13 @@ export const venues: Venue[] = [
     whyZh: "小场、Hip-Hop、周末很挤，但空间真的小。",
     whyEn: "Small hip-hop room that packs out at weekends — energy is high, space is not.",
     crowdNote: "Reported as very crowded at weekends, little seating unless VIP, small floor in front of the DJ.",
-    pricing: { entry: "฿400 / ฿200", entryNote: "Listed as ~฿400 men, ~฿200 women, including a drink; reports range ฿300–500.", drink: "~฿300+ EST.", soloNight: "~฿700–1,400 EST.", table: "NOT REQUIRED" },
+    pricing: { entry: "~฿400 / ~฿200 EST.", entryNote: "Listed as ~฿400 men, ~฿200 women, including a drink; reports range ฿300–500.", drink: "~฿300+ EST.", soloNight: "~฿700–1,400 EST.", table: "NOT REQUIRED" },
     mapsUrl: maps("Sugar Club Bangkok Sukhumvit 11"),
     lastVerified: "18 Aug 2026",
   },
 
   /* ------------------------------- SAT 22 AUG ------------------------------ */
+
   {
     id: "404-22",
     day: 22,
@@ -529,8 +500,13 @@ export const venues: Venue[] = [
     pricing: { entry: "~฿300–500 EST.", entryNote: "No current published door price found — budget for the higher end on a Saturday.", drink: "~฿300+ EST.", soloNight: "~฿800–1,600 EST.", table: "NOT REQUIRED" },
     mapsUrl: maps("404 Club Not Found EmSphere 5M Bangkok"),
     officialUrl: "https://www.facebook.com/404clubnotfound.bkk/",
+    overrideNote: {
+      zh: "换场景推荐：Route 66 分数略高，但周五已经去 RCA，周六故意换 404。",
+      en: "Variety pick. Route 66 scores slightly higher, but Friday already covers RCA — Saturday deliberately switches scene.",
+    },
     lastVerified: "18 Aug 2026",
   },
+
   {
     id: "upper-22",
     day: 22,
@@ -555,8 +531,13 @@ export const venues: Venue[] = [
     pricing: { entry: "~฿400–500 EST.", entryNote: "No current published door price found.", drink: "~฿350+ EST.", soloNight: "~฿900–1,800 EST.", table: "OPTIONAL" },
     mapsUrl: maps("Upper House Bangkok 24BLVD Sukhumvit 24"),
     officialUrl: "https://upperhousebangkok.com/",
+    overrideNote: {
+      zh: "分数比 404 高一点，但 404 是新场，先看它；这里四分钟就到。",
+      en: "Scores a shade higher than tonight's pick, but 404 is the newer scene worth trying first — and this is four minutes away.",
+    },
     lastVerified: "18 Aug 2026",
   },
+
   {
     id: "route66-22",
     day: 22,
@@ -577,11 +558,12 @@ export const venues: Venue[] = [
     whyZh: "人最多的一晚，但周五刚去过，重复了。",
     whyEn: "Objectively the biggest Saturday crowd — deliberately demoted only because Friday already used it.",
     crowdNote: "Busiest night of its week; hard to find a table after 22:00, which is fine when you do not want one.",
-    pricing: { entry: "฿300", entryNote: "Widely listed foreigner entry, returned as ฿300 in drink credit.", drink: "~฿250+ EST.", soloNight: "~฿700–1,500 EST.", table: "NOT REQUIRED" },
+    pricing: { entry: "~฿300 EST.", entryNote: "Widely listed foreigner entry, returned as ฿300 in drink credit.", drink: "~฿250+ EST.", soloNight: "~฿700–1,500 EST.", table: "NOT REQUIRED" },
     mapsUrl: maps("Route 66 Club RCA Royal City Avenue Bangkok"),
     officialUrl: "https://www.route66club.com/",
     lastVerified: "18 Aug 2026",
   },
+
   {
     id: "sugar-22",
     day: 22,
@@ -602,10 +584,11 @@ export const venues: Venue[] = [
     whyZh: "Hip-Hop 想再深一点就来，缺点是场地小。",
     whyEn: "Go if you want the hip-hop turned up; the trade-off is a genuinely small room.",
     crowdNote: "Packed at weekends, minimal seating, small floor. More foreigner-leaning than Phrom Phong rooms.",
-    pricing: { entry: "฿400 / ฿200", entryNote: "Listed as ~฿400 men, ~฿200 women, including a drink; reports range ฿300–500.", drink: "~฿300+ EST.", soloNight: "~฿700–1,400 EST.", table: "NOT REQUIRED" },
+    pricing: { entry: "~฿400 / ~฿200 EST.", entryNote: "Listed as ~฿400 men, ~฿200 women, including a drink; reports range ฿300–500.", drink: "~฿300+ EST.", soloNight: "~฿700–1,400 EST.", table: "NOT REQUIRED" },
     mapsUrl: maps("Sugar Club Bangkok Sukhumvit 11"),
     lastVerified: "18 Aug 2026",
   },
+
   {
     id: "spaceplus-22",
     day: 22,
@@ -626,10 +609,11 @@ export const venues: Venue[] = [
     whyZh: "大场大舞池，但很挤、桌子文化重，一个人不好走动。",
     whyEn: "Big room, big floor — but weekend crush plus heavy table culture makes solo movement hard.",
     crowdNote: "Busiest Fri/Sat; reported as uncomfortably crowded at peak, with a ฿500 door including a drink.",
-    pricing: { entry: "~฿500", entryNote: "Commonly listed at ฿500 with 1 drink; minimum spend can apply on special nights.", drink: "~฿350+ EST.", soloNight: "~฿1,000–2,000 EST.", table: "OPTIONAL" },
+    pricing: { entry: "~฿500 EST.", entryNote: "Commonly listed at ฿500 with 1 drink; minimum spend can apply on special nights.", drink: "~฿350+ EST.", soloNight: "~฿1,000–2,000 EST.", table: "OPTIONAL" },
     mapsUrl: maps("Spaceplus Bangkok Rama 9"),
     lastVerified: "18 Aug 2026",
   },
+
   {
     id: "salone-22",
     day: 22,
@@ -680,7 +664,7 @@ export const FIT_WEIGHTS = [
 const soloScore: Record<Solo, number> = { "Very Easy": 5, Easy: 4, Okay: 3, "Better With Group": 1.5 };
 const socialScore: Record<Social, number> = { "Very Easy": 5, Easy: 4, Mixed: 3, Hard: 1.5 };
 const mixScore: Record<AsianMix, number> = { High: 5, Medium: 3.5, Unknown: 3 };
-const danceScore: Record<Dancefloor, number> = { Excellent: 5, Good: 4, Mixed: 3, "Table-heavy": 1.5, "No floor": 1.5 };
+const danceScore: Record<Dancefloor, number> = { Excellent: 5, Good: 4, Mixed: 3, "Table-heavy": 1.5 };
 const distanceScore: Record<Distance, number> = { "VERY NEAR": 5, NEAR: 4, MODERATE: 2.5, FARTHER: 1 };
 
 export const distanceRank: Record<Distance, number> = { "VERY NEAR": 0, NEAR: 1, MODERATE: 2, FARTHER: 3 };

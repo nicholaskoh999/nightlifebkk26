@@ -65,3 +65,15 @@ npm run build
 ## Deploy
 
 Build the current `main` commit, save it as a version in the existing Bangkok Nightlife Sites project, then publish that saved version. Configure `nightlifebkk.nkmwei.de` through the Sites custom-domain flow; the fallback hosting URL remains available.
+
+## Scope
+
+Club-only. Social/date bars are not ranked here, even when they are easy places
+to talk — a room with no dancefloor cannot be a PRIMARY or a SWITCH.
+
+## Editorial overrides
+
+A slot may outrank a higher-scoring venue, but never silently. Any such venue
+carries an `overrideNote` and the page renders it as **WHY THIS ORDER** on the
+card. The data QA fails the build if a primary sits below another option, or a
+switch below a More option, without one.

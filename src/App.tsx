@@ -30,6 +30,18 @@ function matches(v: Venue, f: Filter) {
 
 const roleRank = { primary: 0, switch: 1, more: 2 } as const;
 
+/** A slot that outranks a higher-scoring option must always say why. */
+function OverrideNote({ venue }: { venue: Venue }) {
+  if (!venue.overrideNote) return null;
+  return (
+    <p className="override">
+      <b>WHY THIS ORDER</b>
+      <span lang="zh-Hans">{venue.overrideNote.zh}</span>
+      <span>{venue.overrideNote.en}</span>
+    </p>
+  );
+}
+
 function PrimaryCard({ venue, onOpen }: { venue: Venue; onOpen: () => void }) {
   const reduce = useReducedMotion();
   return (
@@ -41,6 +53,7 @@ function PrimaryCard({ venue, onOpen }: { venue: Venue; onOpen: () => void }) {
       {venue.warning && <p className="warn">{venue.warning}</p>}
 
       <p className="why"><b lang="zh-Hans">为什么今晚</b><span lang="zh-Hans">{venue.whyZh}</span><span>{venue.whyEn}</span></p>
+      <OverrideNote venue={venue} />
       <FitGrid venue={venue} />
 
       <p className="arrive"><Clock size={15} aria-hidden /><small>ARRIVE</small><b>{venue.arrival}</b></p>
@@ -61,7 +74,9 @@ function SwitchCard({ venue, from, onOpen }: { venue: Venue; from?: string; onOp
       {from && <p className="route"><b>{from}</b><i aria-hidden>&rarr;</i>{venue.venue}</p>}
       <h2>{venue.venue}</h2>
       <p className="place"><MapPin size={13} aria-hidden />{venue.area}</p>
+      {venue.warning && <p className="warn">{venue.warning}</p>}
       <p className="switch-why">{venue.switchReason ?? venue.whyEn}</p>
+      <OverrideNote venue={venue} />
       <p className="mini"><CrowdMeter venue={venue} /> fit {fitBadge(venue)}/5 · {venue.solo} solo · {venue.tableCulture} table · {venue.pricing.entry}</p>
       <div className="actions">
         <MapsLink venue={venue} className="btn-solid" />

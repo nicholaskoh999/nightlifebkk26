@@ -205,6 +205,15 @@ main { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
   font-size: 12px; font-weight: 750;
 }
 
+.override {
+  display: grid; gap: 3px;
+  margin: 14px 0 0; padding: 10px 12px;
+  border-left: 2px solid var(--violet); border-radius: 0 8px 8px 0;
+  background: #1a1730;
+  color: var(--muted); font-size: 12px; line-height: 1.45;
+}
+.override b { color: var(--violet); font-size: 9px; font-weight: 850; letter-spacing: .12em; }
+
 .why { margin: 16px 0 0; font-size: 14px; line-height: 1.5; }
 .why b {
   display: block; margin-bottom: 4px;
