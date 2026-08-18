@@ -96,6 +96,11 @@ export type Day = {
    * arrival night. Rendered as a compact banner, never as a venue claim.
    */
   arrivalNote?: { label: string; zh: string; en: string };
+  /**
+   * Overrides the default "30-MIN RULE" label when the night's decision window
+   * is deliberately wider — a small room needs longer to judge than a big one.
+   */
+  checkLabel?: string;
 };
 
 export const TRIP = { startIso: "2026-08-18", endIso: "2026-08-21", timeZone: "Asia/Bangkok" } as const;
@@ -114,7 +119,11 @@ export const days: Day[] = [
   },
   { id: 19, dow: "WED", date: "19", full: "Wed · 19 Aug 2026", iso: "2026-08-19", headline: "Midweek — go where the crowd already is" },
   { id: 20, dow: "THU", date: "20", full: "Thu · 20 Aug 2026", iso: "2026-08-20", headline: "Thonglor/Ekkamai wakes up on Thursday" },
-  { id: 21, dow: "FRI", date: "21", full: "Fri · 21 Aug 2026", iso: "2026-08-21", headline: "The main crowd night — RCA" },
+  {
+    id: 21, dow: "FRI", date: "21", full: "Fri · 21 Aug 2026", iso: "2026-08-21",
+    headline: "The main crowd night — small room first, RCA as insurance",
+    checkLabel: "30–45 MIN CHECK",
+  },
 ];
 
 const maps = (q: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
@@ -475,28 +484,59 @@ export const venues: Venue[] = [
   /* ------------------------------- FRI 21 AUG ------------------------------ */
 
   {
-    id: "route66-21",
+    id: "404-21",
     day: 21,
     role: "primary",
+    venue: "404 CLUB NOT FOUND",
+    area: "EmSphere 5M · Phrom Phong",
+    distance: "VERY NEAR",
+    status: "CHECK SAME DAY",
+    statusNote: "Re-researched 18 Aug 2026: no date-specific 21 Aug line-up could be confirmed from any current listing. Friday crowd is likely stronger than midweek, but the exact 21 Aug programme is unconfirmed — check their channels on the day.",
+    music: "Open-format",
+    arrival: "23:00–23:30",
+    crowd: 4,
+    solo: "Easy",
+    social: "Easy",
+    asianMix: "High",
+    tableCulture: "Low",
+    dancefloor: "Good",
+    whyZh: "小场先试最适合你：不开桌、站着跳、比较容易自然认识人。先看 30–45 分钟，不够热就直接去 RCA。",
+    whyEn: "Start with the smaller standing-room club: lower table pressure and better solo social flow. Give it 30–45 minutes; if it is weak, move to RCA.",
+    overrideNote: {
+      zh: "Route66 人流更稳，但 404 更符合 solo / 不开桌 / 自然认识人的目标。先试 404，不行再去 Route66。",
+      en: "Route66 is the safer crowd bet, but 404 better matches the solo, no-table, natural-social goal. Try 404 first; use Route66 as crowd insurance.",
+    },
+    crowdNote: "Standing/dancefloor-led micro-club on EmSphere 5M, low table pressure, easy solo entry and a 10-minute ride from the hotel. Friday density is unconfirmed — this is the try-first room, not the guaranteed one.",
+    pricing: { entry: "~฿300–500 EST.", entryNote: "No current published door price found.", drink: "~฿300+ EST.", soloNight: "~฿700–1,500 EST.", table: "NOT REQUIRED" },
+    mapsUrl: maps("404 Club Not Found EmSphere 5M Bangkok"),
+    officialUrl: "https://www.facebook.com/404clubnotfound.bkk/",
+    lastVerified: "18 Aug 2026",
+  },
+
+  {
+    id: "route66-21",
+    day: 21,
+    role: "switch",
     venue: "ROUTE 66",
     area: "RCA · Royal City Avenue",
     distance: "MODERATE",
     status: "RECURRING",
-    statusNote: "Weekly Friday operation is well documented: 22:30 open, three rooms (Hip-Hop / live Thai band / main EDM), ฿300 foreigner entry returned as ฿300 drink credit. No date-specific 21 Aug guest confirmed.",
+    statusNote: "Weekly Friday operation is well documented: nightly opening, multiple rooms (Hip-Hop / live Thai band / main EDM), ฿300 foreigner entry returned as ฿300 drink credit, young Thai crowd. No date-specific 21 Aug guest confirmed.",
     music: "Hip-Hop · Thai pop · EDM (3 rooms)",
-    arrival: "23:00–23:30",
+    arrival: "00:00–00:30",
     crowd: 5,
     solo: "Easy",
     social: "Easy",
     asianMix: "High",
     tableCulture: "Medium",
     dancefloor: "Good",
-    whyZh: "周五最稳的人流，三个房间可以换，Thai/Asian 为主，最符合 crowd-first。",
-    whyEn: "The most reliable Friday crowd in town, and three rooms means you change the vibe without leaving.",
-    crowdNote: "Thai university crowd dominant; rooms are typically packed well before midnight. Entry is effectively free once the drink credit is used.",
+    whyZh: "404 不够热就去 Route66。Friday 人流更稳，而且越接近午夜越适合当第二站。",
+    whyEn: "If 404 is thin, go to Route66. The Friday crowd is more reliable there, and it gets better as a second stop the closer you get to midnight.",
+    switchReason: "Crowd insurance, not a random backup: Route66 is much larger, has multiple rooms and the most reliable Friday crowd in town — so if 404 is weak at 00:00 it should be stronger, not worse. Head for the HIP-HOP room first.",
+    crowdNote: "Thai university crowd dominant (roughly 20–25), rooms typically fill well before midnight. Entry is effectively free once the ฿300 drink credit is used, and no table is needed to stand and dance.",
     pricing: {
       entry: "~฿300 EST.",
-      entryNote: "Widely listed foreigner entry, returned as ฿300 in drink credit. Thai nationals reported free.",
+      entryNote: "Widely listed foreigner entry, returned as ฿300 in drink credit. Thai nationals reported free. Passport required at the door.",
       drink: "~฿250+ EST.",
       soloNight: "~฿700–1,500 EST.",
       table: "NOT REQUIRED",
@@ -509,58 +549,28 @@ export const venues: Venue[] = [
   {
     id: "onyx-21",
     day: 21,
-    role: "switch",
+    role: "more",
     venue: "ONYX",
-    area: "RCA · same strip, 2 min walk",
+    area: "RCA · same strip as Route66, 2 min walk",
     distance: "MODERATE",
     status: "RECURRING",
     statusNote: "Operates every Friday on the same RCA strip. No date-specific 21 Aug line-up confirmed.",
     music: "EDM · commercial",
-    arrival: "00:00–00:30",
+    arrival: "00:30",
     crowd: 5,
     solo: "Okay",
     social: "Mixed",
     asianMix: "High",
     tableCulture: "High",
     dancefloor: "Table-heavy",
-    whyZh: "同一条街，走过去两分钟，不用重新叫车。",
-    whyEn: "Same strip as Route 66 — a two-minute walk, no second taxi, no lost night.",
-    switchReason: "The switch is operational, not aspirational: you are already on RCA, so changing rooms costs two minutes instead of half an hour.",
-    crowdNote: "Bigger production, higher door, more table-led floor. Good crowd, harder to move through than Route 66.",
+    whyZh: "还是好场，就在 Route66 隔壁；但比较看桌，solo 站着跳没那么舒服。",
+    whyEn: "Still a strong room and a two-minute walk from Route66 — but it is table-led, so it fits the solo, no-table goal less well.",
+    crowdNote: "Bigger production and a big crowd, but current reviews keep describing a dancefloor filled with tables — harder to move through than Route66 without bottle service.",
     pricing: { entry: "~฿400–500 EST.", entryNote: "Widely listed door price, usually including drink vouchers. Higher for headliners.", drink: "~฿350+ EST.", soloNight: "~฿900–1,800 EST.", table: "OPTIONAL" },
     mapsUrl: maps("ONYX Bangkok RCA Royal City Avenue"),
     officialUrl: "https://onyxbangkok.club/",
-    overrideNote: {
-      zh: "404 分数更高，但在 Phrom Phong；ONYX 就在同一条街，走两分钟。",
-      en: "404 scores higher but is back in Phrom Phong. ONYX is on the same strip — a switch has to be walkable to be a switch.",
-    },
     lastVerified: "18 Aug 2026",
-  },
-
-  {
-    id: "404-21",
-    day: 21,
-    role: "more",
-    venue: "404 CLUB NOT FOUND",
-    area: "EmSphere 5M · Phrom Phong",
-    distance: "VERY NEAR",
-    status: "CHECK SAME DAY",
-    statusNote: "The old DJ SHANEN listing for 21 Aug could not be re-confirmed and has been withdrawn.",
-    music: "Open-format",
-    arrival: "23:00",
-    crowd: 4,
-    solo: "Easy",
-    social: "Easy",
-    asianMix: "High",
-    tableCulture: "Low",
-    dancefloor: "Good",
-    whyZh: "不想跑 RCA 就留在 Phrom Phong，这是最近的周五选择。",
-    whyEn: "The stay-local Friday option if you do not feel like the RCA ride at all.",
-    crowdNote: "Standing/dancefloor-led micro-club, low table pressure. Friday density unconfirmed.",
-    pricing: { entry: "~฿300–500 EST.", entryNote: "No current published door price found.", drink: "~฿300+ EST.", soloNight: "~฿700–1,500 EST.", table: "NOT REQUIRED" },
-    mapsUrl: maps("404 Club Not Found EmSphere 5M Bangkok"),
-    officialUrl: "https://www.facebook.com/404clubnotfound.bkk/",
-    lastVerified: "18 Aug 2026",
+    warning: "Table-led floor",
   },
 
   {

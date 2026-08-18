@@ -82,7 +82,9 @@ from the trip. It checks the trip window (`2026-08-18` → `2026-08-21`), that
 the four nights are exactly 18–21, that no venue or radar entry is pinned to
 22 Aug, that each night has exactly one PRIMARY and one SWITCH matching the
 agreed route, that no slot outranks a higher-scoring venue without an
-`overrideNote`, and that every price still carries its `EST.` marker.
+`overrideNote`, and that every price still carries its `EST.` marker. Friday is
+guarded by name: the old `ROUTE 66 -> ONYX` route fails the build, and ONYX must
+stay on the night as a MORE OPTIONS entry.
 
 ## Deploy
 
@@ -119,3 +121,9 @@ venue without one.
 Tue 18 is the live example: Upper House scores a shade higher and is closer to
 base, but Dope & Dirty is the room with an actual Tuesday hip-hop line-up — so
 it takes PRIMARY and says why on the card.
+
+Fri 21 is the second: Route 66 scores 4.4 against 404's 4.2 and has the more
+reliable Friday crowd, but 404 is the standing-room, low-table, walk-in-alone
+room the trip is actually optimised for. The scores are left honest — 404 takes
+PRIMARY on an `overrideNote`, and Route 66 becomes the crowd-insurance SWITCH
+after a 30–45 minute check.

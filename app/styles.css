@@ -355,6 +355,8 @@ main { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
 .rule ul { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
 .rule li { color: var(--muted); font-size: 14px; }
 .rule-do { margin: 14px 0 0; font-size: clamp(18px, 4.4vw, 22px); font-weight: 850; letter-spacing: -.02em; }
+.rule-stay { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.rule-stay b { color: var(--text); letter-spacing: .1em; font-size: 12px; }
 .rule-route {
   margin: 12px 0 0; padding: 11px 12px; border-radius: 9px;
   background: var(--bg-3); font-size: 14px; font-weight: 750; overflow-wrap: anywhere;

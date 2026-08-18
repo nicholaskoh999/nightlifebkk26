@@ -86,16 +86,17 @@ function SwitchCard({ venue, from, onOpen }: { venue: Venue; from?: string; onOp
   );
 }
 
-function ThirtyMinRule({ from, to }: { from?: string; to?: string }) {
+function ThirtyMinRule({ from, to, label }: { from?: string; to?: string; label?: string }) {
   return (
-    <section className="rule" aria-label="30 minute rule">
-      <p className="rule-title">30-MIN RULE</p>
+    <section className="rule" aria-label="Time-check rule">
+      <p className="rule-title">{label ?? "30-MIN RULE"}</p>
       <ul>
         <li>Too many tables?</li>
         <li>No crowd movement?</li>
         <li>Feels awkward solo?</li>
       </ul>
       <p className="rule-do">→ SWITCH. Don&apos;t waste the night.</p>
+      <p className="rule-stay"><b>STAY IF</b> the standing crowd is active, people are moving and the room keeps filling.</p>
       {from && to && <p className="rule-route"><b>{from}</b> → <b>{to}</b></p>}
       <p className="rule-note"><span lang="zh-Hans">最多 2 间</span> · Two venues is the whole plan. Anything else lives in More options.</p>
     </section>
@@ -231,7 +232,7 @@ export default function NightlifeApp() {
         </div>
 
         <div className="lower">
-          <ThirtyMinRule from={primary?.venue} to={backup?.venue} />
+          <ThirtyMinRule from={primary?.venue} to={backup?.venue} label={dayData.checkLabel} />
           <MoreOptions list={rest} onOpen={setSheet} />
         </div>
 

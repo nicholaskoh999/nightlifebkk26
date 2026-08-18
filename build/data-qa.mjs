@@ -68,7 +68,7 @@ const ROUTES = {
   18: { primary: "DOPE & DIRTY", switch: "UPPER HOUSE" },
   19: { primary: "MU:IN", switch: "404 CLUB NOT FOUND" },
   20: { primary: "UPPER HOUSE", switch: "HOUSE OF SAVOY" },
-  21: { primary: "ROUTE 66", switch: "ONYX" },
+  21: { primary: "404 CLUB NOT FOUND", switch: "ROUTE 66" },
 };
 
 for (const day of EXPECTED_DAYS) {
@@ -92,6 +92,27 @@ check(
   !venues.some(v => /TICTACTOE/i.test(v.venue)),
   "TICTACTOE is not a club-planner venue",
 );
+
+/* --------------------- Friday must not regress to RCA-first -------------- */
+
+/*
+ * The old Friday route (ROUTE 66 -> ONYX) is a plausible-looking mistake: it
+ * ranks by raw crowd size and quietly loses the solo / no-table intent. It is
+ * called out by name so a revert fails loudly instead of shipping.
+ */
+{
+  const fri = venues.filter(v => v.day === 21);
+  const friPrimary = fri.find(v => v.role === "primary");
+  const friSwitch = fri.find(v => v.role === "switch");
+  check(
+    !(friPrimary?.venue === "ROUTE 66" && friSwitch?.venue === "ONYX"),
+    "Friday has regressed to ROUTE 66 -> ONYX; the route is 404 CLUB NOT FOUND -> ROUTE 66",
+  );
+  check(
+    fri.some(v => v.role === "more" && v.venue === "ONYX"),
+    "ONYX must stay on Friday as a MORE OPTIONS entry, not be deleted",
+  );
+}
 
 /* ---------------------- ranking may never be silent ---------------------- */
 
