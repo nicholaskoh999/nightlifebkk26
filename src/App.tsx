@@ -1,26 +1,251 @@
 "use client";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronRight, Flame, Info, MapPin, Music2, SlidersHorizontal, Users, X } from "lucide-react";
-import { useMemo, useState } from "react";
-import { days, venues, type Venue } from "./data/nightlife";
+import { ChevronDown, Clock, MapPin, Radar, Users } from "lucide-react";
+import { useMemo, useState, useSyncExternalStore } from "react";
+import { days, distanceRank, fitBadge, fitScore, venues, type DayId, type Venue } from "./data/nightlife";
 import { eventRadar } from "./data/event-radar";
+import { currentTripState, subscribeTripState } from "./lib/trip-clock";
+import { Budget, CrowdMeter, FitGrid, MapsLink, StatusTag } from "./components/Bits";
+import VenueSheet from "./components/VenueSheet";
 
-const filters = ["Ladies Night", "Special Event", "Dancefloor", "Solo", "No table required", "Hip-Hop", "EDM", "Hard Techno"];
-const distanceRank = { "VERY NEAR": 0, NEAR: 1, MODERATE: 2, FARTHER: 3 };
-const crowdLabel = (v: Venue) => v.crowd === 5 ? "非常多人 · VERY HIGH" : v.crowd === 4 ? "人气高 · HIGH" : "看当天活动 · EVENT-DEPENDENT";
-const crowdReason = (v: Venue) => v.status === "VERIFIED" && v.event ? "有 confirmed special event" : v.status === "RECURRING" ? "每周固定 · recurring night" : v.day === 4 ? "Friday 人气通常更稳" : "普通 weekday · 暂无 confirmed special event";
-const chineseWhy: Record<string, string> = {dope:"Day 1 是落地夜。这里比较适合 solo walk-in，dancefloor 比 table-heavy club 更自在；到太迟就优先选 Phrom Phong 的 backup。",upper:"离酒店很近，落地晚时比跑 Ekkamai 更实际；不过 Tuesday 没有 confirmed event 加持。","savoy-tue":"环境更 upscale，不过比较偏 table/social；适合想省车程的 late-arrival backup。",skylab:"想要 EDM 大场可以考虑，不过从 Phrom Phong 过去较远，lineup 要当天再确认。",muin:"Wednesday 有固定 Ladies Night，人会比较集中；weekday 想要最稳的人气，这家最直接。","tictactoe-wed":"有 PURPEECH event，social 气氛比较自然；不想直接冲 superclub 时很好选。",offmap:"也是 Wednesday Ladies Night 的选择，比随便找一间 weekday club 更有理由去。","404-wed":"EmSphere 里比较轻松的 backup；没确认 guest DJ，所以当天再看比较好。",salone:"Thursday 本来只是普通 weekday，但 20 Aug 有 confirmed CAVIA special night，明显比随机去 club 更值得。","tictactoe-thu":"离酒店近、比较好 social；如果 SALONE 太 formal，这家更轻松。","savoy-thu":"有 listing 但未直接 verified；想要 Sukhumvit 24 的 party option 可以当天再确认。",onyx:"RCA 大场只有在当天 lineup 很强时才值得跑；table culture 偏重。",void:"Friday 加 confirmed FACE 2 FACE，想认真跳舞这是最强选择；只是 Hard Techno 要先确认合不合口味。","404-fri":"有 confirmed guest DJ，Friday 气氛够、room 也比较 solo-friendly。",route66:"Friday 人通常稳，不过不用一定开桌不代表 table culture 不重。",sugar:"如果 VOID 的 Hard Techno 不合胃口，直接转 Sukhumvit 11 的 Hip-Hop backup。"};
-venues.forEach(v => { v.why = chineseWhy[v.id] || v.why; });
-function matches(v: Venue, f: string) { const t = `${v.event} ${v.music}`.toLowerCase(); if (f === "Ladies Night") return t.includes("ladies"); if (f === "Special Event") return ["VERIFIED", "LISTED"].includes(v.status) && !!v.event; if (f === "Dancefloor") return v.dancefloor === "Excellent" || v.dancefloor === "Good"; if (f === "Solo") return v.solo === "Very Easy" || v.solo === "Easy"; if (f === "No table required") return v.tableRequired === "No"; return t.includes(f.toLowerCase()); }
+/* Filters follow the actual decision, not music-press genres. */
+const FILTERS = [
+  "Crowd first", "Solo friendly", "Easy social", "No table",
+  "Dancefloor", "Hip-Hop", "EDM", "Special event", "Near hotel",
+] as const;
+type Filter = (typeof FILTERS)[number];
 
-function Crowd({ venue }: { venue: Venue }) { return <div className="crowd"><div className="flames" aria-label={`${venue.crowd} of 5 crowd confidence`}>{Array.from({ length: venue.crowd }, (_, i) => <Flame key={i} size={19} fill="currentColor" />)}</div><strong>{crowdLabel(venue)}</strong><span>{crowdReason(venue)}</span></div>; }
-function PrimaryCard({ venue, onOpen }: { venue: Venue; onOpen: () => void }) { return <motion.article className="primary-card" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}><div className="card-kicker"><span>TONIGHT&apos;S PICK</span><b className={`status ${venue.status.toLowerCase().replaceAll(" ", "")}`}>{venue.status}</b></div><h1>{venue.venue}</h1>{venue.event && <p className="event-chip">{venue.event}</p>}<Crowd venue={venue} /><p className="why"><b>为什么今晚：</b>{venue.why}</p><div className="metrics"><span><small>Dancefloor</small>{venue.dancefloor}</span><span><small>Solo</small>{venue.solo}</span><span><small>Table</small>{venue.tableRequired}</span><span><small>Budget</small>{venue.budget}</span></div><div className="arrival"><small>Suggested arrival</small><b>{venue.arrival}</b></div><div className="actions"><button onClick={onOpen}>Details</button><a href={venue.officialVenueUrl} target="_blank" rel="noreferrer">Maps</a></div></motion.article>; }
-function Backup({ venue, index, onOpen }: { venue: Venue; index: number; onOpen: () => void }) { return <><div className="backup"><span className="backup-num">#{index}</span><button className="backup-details" onClick={onOpen}><span><b>{venue.venue}</b><span className="backup-event">{venue.event || venue.music}</span><span className="backup-meta"><Flame size={13} fill="currentColor" /> {crowdLabel(venue)}</span><small>{venue.why}</small></span><ChevronRight size={18} /></button><a className="backup-maps" href={venue.officialVenueUrl} target="_blank" rel="noreferrer"><MapPin size={15} />Maps</a></div>{index === 4 && <EventRadar day={venue.day} />}</>; }
-function EventRadar({ day }: { day: number }) { const items = eventRadar.filter(item => item.day === day); if (!items.length) return null; return <section className="event-radar" aria-label="Event radar"><p>EVENT RADAR · 值得留意</p>{items.map(item => <article className="radar-card" key={`${item.day}-${item.event}`}><a className="radar-copy" href={item.eventSourceUrl} target="_blank" rel="noreferrer"><span className="radar-top"><b>{item.venue}</b><span>{item.area} · {item.time}</span><i className="radar-status">{item.status}</i></span><strong>{item.event}</strong><span className="radar-meta">{item.crowd} · {item.lastVerified}</span><span className="radar-note">{item.note}</span></a><a className="radar-maps" href={item.officialVenueUrl} target="_blank" rel="noreferrer"><MapPin size={15} />Maps</a></article>)}</section>; }
+function matches(v: Venue, f: Filter) {
+  switch (f) {
+    case "Crowd first": return v.crowd >= 4;
+    case "Solo friendly": return v.solo === "Very Easy" || v.solo === "Easy";
+    case "Easy social": return v.social === "Very Easy" || v.social === "Easy";
+    case "No table": return v.tableCulture !== "High" && v.pricing.table === "NOT REQUIRED";
+    case "Dancefloor": return v.dancefloor === "Excellent" || v.dancefloor === "Good";
+    case "Special event": return !!v.event;
+    case "Near hotel": return v.distance === "VERY NEAR" || v.distance === "NEAR";
+    default: return v.music.toLowerCase().includes(f.toLowerCase());
+  }
+}
+
+const roleRank = { primary: 0, switch: 1, more: 2 } as const;
+
+/** A slot that outranks a higher-scoring option must always say why. */
+function OverrideNote({ venue }: { venue: Venue }) {
+  if (!venue.overrideNote) return null;
+  return (
+    <p className="override">
+      <b>WHY THIS ORDER</b>
+      <span lang="zh-Hans">{venue.overrideNote.zh}</span>
+      <span>{venue.overrideNote.en}</span>
+    </p>
+  );
+}
+
+function PrimaryCard({ venue, onOpen }: { venue: Venue; onOpen: () => void }) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.article className="primary" initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+      <p className="kicker"><span>TONIGHT&apos;S PICK · <span lang="zh-Hans">今晚首选</span></span><StatusTag venue={venue} /></p>
+      <h1>{venue.venue}</h1>
+      <p className="place"><MapPin size={13} aria-hidden />{venue.area}</p>
+      {venue.event && <p className="event-chip">{venue.event}</p>}
+      {venue.warning && <p className="warn">{venue.warning}</p>}
+
+      <p className="why"><b lang="zh-Hans">为什么今晚</b><span lang="zh-Hans">{venue.whyZh}</span><span>{venue.whyEn}</span></p>
+      <OverrideNote venue={venue} />
+      <FitGrid venue={venue} />
+
+      <p className="arrive"><Clock size={15} aria-hidden /><small>ARRIVE</small><b>{venue.arrival}</b></p>
+      <Budget venue={venue} />
+
+      <div className="actions">
+        <MapsLink venue={venue} className="btn-solid" />
+        <button className="btn-ghost" onClick={onOpen}>Details · <span lang="zh-Hans">看详情</span></button>
+      </div>
+    </motion.article>
+  );
+}
+
+function SwitchCard({ venue, from, onOpen }: { venue: Venue; from?: string; onOpen: () => void }) {
+  return (
+    <article className="switch">
+      <p className="kicker"><span>SWITCH TO · <span lang="zh-Hans">不对就走</span></span><StatusTag venue={venue} /></p>
+      {from && <p className="route"><b>{from}</b><i aria-hidden>&rarr;</i>{venue.venue}</p>}
+      <h2>{venue.venue}</h2>
+      <p className="place"><MapPin size={13} aria-hidden />{venue.area}</p>
+      {venue.warning && <p className="warn">{venue.warning}</p>}
+      <p className="switch-why">{venue.switchReason ?? venue.whyEn}</p>
+      <OverrideNote venue={venue} />
+      <p className="mini"><CrowdMeter venue={venue} /> fit {fitBadge(venue)}/5 · {venue.solo} solo · {venue.tableCulture} table · {venue.pricing.entry}</p>
+      <div className="actions">
+        <MapsLink venue={venue} className="btn-solid" />
+        <button className="btn-ghost" onClick={onOpen}>Details</button>
+      </div>
+    </article>
+  );
+}
+
+function ThirtyMinRule({ from, to }: { from?: string; to?: string }) {
+  return (
+    <section className="rule" aria-label="30 minute rule">
+      <p className="rule-title">30-MIN RULE</p>
+      <ul>
+        <li>Too many tables?</li>
+        <li>No crowd movement?</li>
+        <li>Feels awkward solo?</li>
+      </ul>
+      <p className="rule-do">→ SWITCH. Don&apos;t waste the night.</p>
+      {from && to && <p className="rule-route"><b>{from}</b> → <b>{to}</b></p>}
+      <p className="rule-note"><span lang="zh-Hans">最多 2 间</span> · Two venues is the whole plan. Anything else lives in More options.</p>
+    </section>
+  );
+}
+
+function EventRadarPanel({ day }: { day: DayId }) {
+  const items = eventRadar.filter(i => i.day === day);
+  if (!items.length) return null;
+  return (
+    <section className="radar" aria-label="Event radar">
+      <p className="kicker"><span><Radar size={13} aria-hidden /> EVENT RADAR</span></p>
+      {items.map(i => (
+        <article key={`${i.day}-${i.venue}`}>
+          <p className="radar-top"><b>{i.venue}</b><i>{i.status}</i></p>
+          <strong>{i.event}</strong>
+          <span className="mini">{i.area} · {i.time}</span>
+          <span className="radar-note">{i.note}</span>
+          <span className="radar-links">
+            <a href={i.mapsUrl} target="_blank" rel="noopener noreferrer">Maps</a>
+            <a href={i.eventSourceUrl} target="_blank" rel="noopener noreferrer">Listing</a>
+          </span>
+        </article>
+      ))}
+    </section>
+  );
+}
+
+function MoreOptions({ list, onOpen }: { list: Venue[]; onOpen: (v: Venue) => void }) {
+  const [open, setOpen] = useState(false);
+  if (!list.length) return null;
+  return (
+    <section className="more">
+      <button className="more-toggle" aria-expanded={open} onClick={() => setOpen(o => !o)}>
+        <span>MORE OPTIONS · <span lang="zh-Hans">其他选择</span> ({list.length})</span>
+        <ChevronDown size={18} className={open ? "flip" : ""} aria-hidden />
+      </button>
+      {open && (
+        <ul className="more-list">
+          {list.map(v => (
+            <li key={v.id}>
+              <button className="more-main" onClick={() => onOpen(v)}>
+                <span className="more-name"><b>{v.venue}</b><StatusTag venue={v} /></span>
+                <span className="mini">{v.area} · {v.music}</span>
+                <span className="mini"><CrowdMeter venue={v} /> {v.solo} solo · {v.tableCulture} table · fit {fitScore(v).toFixed(1)}</span>
+                <span className="more-why">{v.whyEn}</span>
+              </button>
+              <MapsLink venue={v} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
 
 export default function NightlifeApp() {
-  const reduce = useReducedMotion(); const [day, setDay] = useState(1); const [active, setActive] = useState<string[]>([]); const [drawer, setDrawer] = useState<Venue | null>(null); const [filterOpen, setFilterOpen] = useState(false); const [crowdInfo, setCrowdInfo] = useState(false); const [near, setNear] = useState(false);
-  const selected = useMemo(() => venues.filter(v => v.day === day).filter(v => active.every(f => matches(v, f))).sort((a, b) => near ? distanceRank[a.distance] - distanceRank[b.distance] || a.role.localeCompare(b.role) : a.role.localeCompare(b.role)), [day, active, near]);
-  const primary = selected.find(v => v.role === "primary") || selected[0]; const backups = selected.filter(v => v.id !== primary?.id).slice(0, 3); const dayData = days.find(d => d.id === day);
-  return <main><header><b>BKK / NIGHTLIFE</b><span>4 DAYS TO GO</span></header><section className="compact-hero"><h2>Bangkok Nightlife <em>&apos;26</em></h2><p>18–21 AUG · 4 NIGHTS</p></section><nav className="days" aria-label="Choose night">{days.map(d => <button className={day === d.id ? "on" : ""} onClick={() => { setDay(d.id); setNear(false); }} key={d.id}><b>D{d.id}</b><span>{d.label.split(" · ")[0].replace("Tue", "Tue").replace("Wed", "Wed").replace("Thu", "Thu").replace("Fri", "Fri")}</span></button>)}</nav><section className="quickbar"><button onClick={() => { setActive([]); setNear(false); }}><Flame size={17} /> 最多人</button><button onClick={() => { setNear(true); setActive([]); }}><MapPin size={17} /> 离我近</button><button onClick={() => setFilterOpen(true)}><SlidersHorizontal size={17} /> Filters{active.length ? ` · ${active.length}` : ""}</button></section><section className="dashboard"><div className="section-title"><div><p>{dayData?.label} · {dayData?.pick}</p><h3>Tonight&apos;s decision</h3></div><button className="info" aria-label="Crowd confidence information" onClick={() => setCrowdInfo(!crowdInfo)}><Info size={18} /></button>{crowdInfo && <div className="tooltip">Estimate based on scheduled events, recurring nights and typical venue popularity. Not live occupancy data.</div>}</div>{primary ? <PrimaryCard venue={primary} onOpen={() => setDrawer(primary)} /> : <p>No venues match these filters.</p>}<aside className="backup-panel"><p>BACKUP PLAN</p>{backups.map((v, i) => <Backup key={v.id} venue={v} index={i + 2} onOpen={() => setDrawer(v)} />)}</aside></section><section className="lower"><div className="decision"><p>QUICK DECISION</p><h3>懒得选？按现在的心情。</h3><div>{[["容易 social", "Ladies Night"], ["真正 dancefloor", "Dancefloor"], ["不要开桌", "No table required"]].map(([label, filter]) => <button key={label} onClick={() => { setActive([filter]); setNear(false); }}>{label}<ChevronRight size={16} /></button>)}</div></div><div className="drinks"><p>ONE-PERSON DRINK GUIDE</p><h3>Easy to order. Easy to judge.</h3>{[["Whisky Highball", "Simple and easy to judge."], ["Vodka Soda", "Single spirit + mixer."], ["Beer", "Slowest and easiest to control."]].map(([name, note]) => <article key={name}><Music2 size={16} /><b>{name}</b><span>{note}</span></article>)}</div></section><footer><Users size={16} /> Data is event-led and date-specific. Check same-day status before leaving.</footer><div className="mobile-bar"><span>D{day} · {primary?.venue}</span><div><a href={primary?.officialVenueUrl} target="_blank" rel="noreferrer">Maps</a><button onClick={() => primary && setDrawer(primary)}>Details</button></div></div><AnimatePresence>{filterOpen && <motion.div className="backdrop filter-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setFilterOpen(false)}><motion.section className="filter-sheet" initial={reduce ? {} : { y: 260 }} animate={{ y: 0 }} exit={reduce ? {} : { y: 260 }} onClick={e => e.stopPropagation()}><div><b>Filters</b><button aria-label="Close filters" onClick={() => setFilterOpen(false)}><X /></button></div><p>Fine-tune this night&apos;s four choices.</p><section>{filters.map(f => <button className={active.includes(f) ? "on" : ""} onClick={() => setActive(x => x.includes(f) ? x.filter(y => y !== f) : [...x, f])} key={f}>{f}</button>)}</section><button className="done" onClick={() => setFilterOpen(false)}>Done</button></motion.section></motion.div>}{drawer && <motion.div className="backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDrawer(null)}><motion.aside initial={reduce ? {} : { x: 480 }} animate={{ x: 0 }} exit={reduce ? {} : { x: 480 }} onClick={e => e.stopPropagation()}><button className="close" onClick={() => setDrawer(null)} aria-label="Close"><X /></button><p>{drawer.area} · {drawer.distance} from TRIBE Sukhumvit 39</p><h2>{drawer.venue}</h2>{drawer.event && <div className="event-chip">{drawer.event}</div>}<Crowd venue={drawer} /><dl><div><dt>Why tonight</dt><dd>{drawer.why}</dd></div><div><dt>Music</dt><dd>{drawer.music}</dd></div><div><dt>Dancefloor</dt><dd>{drawer.dancefloor}</dd></div><div><dt>Table / Solo</dt><dd>{drawer.tableRequired} · {drawer.solo}</dd></div><div><dt>Budget / arrival</dt><dd>{drawer.budget} · {drawer.arrival}</dd></div><div><dt>Sources</dt><dd><a href={drawer.officialVenueUrl} target="_blank" rel="noreferrer">Official venue / map</a>{drawer.eventSourceUrl && <> · <a href={drawer.eventSourceUrl} target="_blank" rel="noreferrer">Event source</a></>}</dd></div></dl></motion.aside></motion.div>}</AnimatePresence></main>;
+  const [chosenDay, setChosenDay] = useState<DayId | null>(null);
+  const [active, setActive] = useState<Filter[]>([]);
+  const [sheet, setSheet] = useState<Venue | null>(null);
+
+  // Read on the client only — the server snapshot is null, so there is nothing
+  // to mismatch on hydration. Friday is the fallback when the trip is not live.
+  const trip = useSyncExternalStore(subscribeTripState, currentTripState, () => null);
+  const day: DayId = chosenDay ?? trip?.today ?? 21;
+  const setDay = setChosenDay;
+
+  const pool = useMemo(() => {
+    const forDay = venues.filter(v => v.day === day && active.every(f => matches(v, f)));
+    if (!active.length) {
+      return [...forDay].sort((a, b) => roleRank[a.role] - roleRank[b.role] || fitScore(b) - fitScore(a));
+    }
+    // With filters on, the editorial roles no longer apply — rank by fit.
+    return [...forDay].sort((a, b) => fitScore(b) - fitScore(a) || distanceRank[a.distance] - distanceRank[b.distance]);
+  }, [day, active]);
+
+  const primary = pool[0];
+  const backup = pool[1];
+  const rest = pool.slice(2);
+  const dayData = days.find(d => d.id === day)!;
+  const toggle = (f: Filter) => setActive(a => (a.includes(f) ? a.filter(x => x !== f) : [...a, f]));
+
+  return (
+    <>
+      <a className="skip" href="#tonight">Skip to tonight&apos;s pick</a>
+      <header className="topbar">
+        <b>BKK / NIGHTLIFE</b>
+        <span className="trip-state">{trip ? trip.label : " "}</span>
+      </header>
+
+      <main>
+        <section className="hero">
+          <h1>BANGKOK NIGHTLIFE <em>&apos;26</em></h1>
+          <p>19–22 AUG · 4 NIGHTS · CROWD FIRST</p>
+        </section>
+
+        <nav className="days" aria-label="Choose night">
+          {days.map(d => (
+            <button key={d.id} className={day === d.id ? "on" : ""} aria-current={day === d.id} onClick={() => setDay(d.id)}>
+              <b>{d.dow}</b><span>{d.date}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="filterbar" role="group" aria-label="Quick filters">
+          <button className={active.length ? "chip" : "chip on"} onClick={() => setActive([])}>Recommended</button>
+          {FILTERS.map(f => (
+            <button key={f} className={active.includes(f) ? "chip on" : "chip"} aria-pressed={active.includes(f)} onClick={() => toggle(f)}>{f}</button>
+          ))}
+        </div>
+
+        <section className="dayline">
+          <p>{dayData.full}</p>
+          <h2>{dayData.headline}</h2>
+        </section>
+
+        <div className="dashboard" id="tonight">
+          {primary
+            ? <PrimaryCard venue={primary} onOpen={() => setSheet(primary)} />
+            : <p className="empty">No venue matches these filters. <button className="linkish" onClick={() => setActive([])}>Reset</button></p>}
+          <div className="rail">
+            {backup && <SwitchCard venue={backup} from={primary?.venue} onOpen={() => setSheet(backup)} />}
+            <EventRadarPanel day={day} />
+          </div>
+        </div>
+
+        <div className="lower">
+          <ThirtyMinRule from={primary?.venue} to={backup?.venue} />
+          <MoreOptions list={rest} onOpen={setSheet} />
+        </div>
+
+        <footer>
+          <p>
+            <Users size={15} aria-hidden />
+            <span>Crowd, solo and social ratings are judgement calls from current venue reporting — not live occupancy or demographic data. Check line-ups on the day.</span>
+          </p>
+        </footer>
+      </main>
+
+      {primary && (
+        <div className="mobilebar">
+          <span>{dayData.dow} {dayData.date} · {primary.venue}</span>
+          <span className="mobilebar-actions">
+            <a href={primary.mapsUrl} target="_blank" rel="noopener noreferrer">Maps</a>
+            <button onClick={() => setSheet(primary)}>Details</button>
+          </span>
+        </div>
+      )}
+
+      <AnimatePresence>{sheet && <VenueSheet key={sheet.id} venue={sheet} onClose={() => setSheet(null)} />}</AnimatePresence>
+    </>
+  );
 }

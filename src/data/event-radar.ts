@@ -1,46 +1,60 @@
-import type { Status } from "./nightlife";
+import type { DayId, Status } from "./nightlife";
 
 export type RadarEvent = {
-  day: number;
+  day: DayId;
   venue: string;
   area: string;
   event: string;
   time: string;
-  status: Extract<Status, "VERIFIED" | "LISTED">;
-  crowd: "EVENT-DEPENDENT" | "NICHE";
+  status: Extract<Status, "LISTED" | "CHECK SAME DAY">;
+  /** Why it is on the radar and not in the main route. */
   note: string;
-  officialVenueUrl: string;
+  mapsUrl: string;
   eventSourceUrl: string;
   lastVerified: string;
 };
 
-// Intentionally separate from the ranked four: date-specific listings that
-// should not distort the crowd-first recommendations.
+const maps = (q: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+
+/**
+ * Date-specific listings that are real but do not fit a crowd-first, solo,
+ * natural-interaction night. Kept visible, kept out of the main route.
+ */
 export const eventRadar: RadarEvent[] = [
   {
-    day: 1,
-    venue: "CULTURE CAFE",
-    area: "Phra Nakhon",
-    event: "Bangkok Vinyl Minimal & Techno Sessions · MOODYBOOM / Highwire crew",
-    time: "20:00",
+    day: 19,
+    venue: "AMNESIA",
+    area: "Sukhumvit 63 · Ekkamai",
+    event: "THE ONE AND ONLY UPLIFTING TRANCE",
+    time: "21:00–04:00",
     status: "LISTED",
-    crowd: "EVENT-DEPENDENT",
-    note: "Underground vinyl route. Go only if the session is still running after landing.",
-    officialVenueUrl: "https://www.google.com/maps/search/?api=1&query=Culture+Cafe+Bangkok",
-    eventSourceUrl: "https://bkkvibe.com/",
-    lastVerified: "14 Aug 2026",
+    note: "Genuine Wednesday listing, but trance nights are heads-down and niche — poor solo-social fit.",
+    mapsUrl: maps("Amnesia Bangkok Ekkamai Sukhumvit 63"),
+    eventSourceUrl: "https://expatsinbangkok.com/event/nightclubs-and-parties",
+    lastVerified: "18 Aug 2026",
   },
   {
-    day: 4,
-    venue: "CULTURE CAFE",
-    area: "Phra Nakhon",
-    event: "HARD EDGE: Dark & Industrial Hard Techno",
-    time: "20:00",
+    day: 21,
+    venue: "LEVELS",
+    area: "Aloft Hotel 6F · Sukhumvit 11",
+    event: "PERFECT FRIDAYS",
+    time: "21:00–03:00",
     status: "LISTED",
-    crowd: "NICHE",
-    note: "Harder underground alternative; the main plan remains the crowd-first choice.",
-    officialVenueUrl: "https://www.google.com/maps/search/?api=1&query=Culture+Cafe+Bangkok",
-    eventSourceUrl: "https://bkkvibe.com/",
-    lastVerified: "14 Aug 2026",
+    note: "Recurring Friday listing. Tourist-heavy Sukhumvit 11 room — fine as a late Plan C, weaker on Asian-mix fit.",
+    mapsUrl: maps("Levels Club Bangkok Aloft Sukhumvit 11"),
+    eventSourceUrl: "https://allevents.in/bangkok/parties",
+    lastVerified: "18 Aug 2026",
+  },
+  {
+    day: 22,
+    venue: "BAFROS",
+    area: "Asok",
+    event: "PARTY HITS · OSOCITY",
+    time: "22:00",
+    status: "LISTED",
+    note: "Afrobeats / Amapiano / Soca. Good room, but a niche music crowd rather than a big mainstream Saturday floor.",
+    mapsUrl: maps("Bafros Asok Bangkok"),
+    eventSourceUrl: "https://allevents.in/bangkok/parties",
+    lastVerified: "18 Aug 2026",
   },
 ];
